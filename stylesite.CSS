@@ -1,0 +1,33 @@
+h1 {
+  font-size: 60px;
+  text-align: center;
+  color:#ffffff;
+}
+p,
+li {
+  font-size: 16px;
+  line-height: 2;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+li {
+  background-color: rgb(234, 0, 255);
+  border: 1px solid rgb(0, 0, 0);
+  margin-bottom: 5px;
+}
+html {
+  /* px signifie "pixels". La taille de police de base est maintenant de 10
+     pixels de haut */
+  font-size: 10px;
+  /* Remplacez EMPLACEMENT par la valeur de la propriété font-family obtenue
+     depuis Google Fonts */
+  font-family: EMPLACEMENT;
+}
+html {
+  background-color: #000000;
+}
+a {
+    font-size: 20px;
+    color: #ff0000;
+}
