@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>pong du futur</title>
+   
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      canvas {
+        background: #eeeeee;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Bienvenue dans Pong du futur</p>
+    <canvas id="myCanvas" width="480" height="320"></canvas> 
+    <button id="runButton">Démarrer le jeu</button>
+    <script>
+        
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+const ballRadius = 10;
+let x = canvas.width / 2;
+let y = canvas.height - 30;
+let dx = 2;
+let dy = -2;
+const paddleHeight= 75;
+const paddleWidth = 10;
+const paddleHeight2= 75;
+const paddleWidth2 = 10;
+let interval=0
+const ballSprite = new Image();
+ballSprite.src = 'ball_sprites.png'; // prendre l'image "ball_sprites.png"
+
+const spriteWidth = 20;  
+const spriteHeight = 20;
+const totalFrames = 12;  
+
+let currentFrame = 0;    
+let frameTimer = 0;      
+const frameSpeed = 10;   
+
+
+let paddleX = canvas.width-paddleWidth
+let paddleY = (canvas.height-paddleHeight)/2
+let paddleX2 = 0
+let paddleY2 = (canvas.height-paddleHeight2)/2
+let upPressed = false;
+let downPressed = false;
+let upPressed2 = false;
+let downPressed2 = false;
+let score = 0;
+let score2 = 0
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * (max-1))+1;
+}
+
+function resetBall(){
+x = canvas.width / 2;
+y = canvas.height - 30;
+dx=getRandomInt(5)
+dy=-getRandomInt(5)
+}
+
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+    frameTimer++;
+  if (frameTimer >= frameSpeed) {
+    currentFrame = (currentFrame + 1) % totalFrames; // Boucle de 0 à 3
+    frameTimer = 0;
+  }
+ const spriteX = currentFrame * spriteWidth;
+ 
+  ctx.drawImage(
+    ballSprite,
+    spriteX, 0,           
+    spriteWidth, spriteHeight, 
+    x - ballRadius, y - ballRadius, 
+    ballRadius * 2, ballRadius * 2  
+  );
+  
+  ctx.closePath();
+}
+function drawPaddle() {
+  ctx.beginPath();
+  ctx.rect(paddleX, paddleY,paddleWidth ,paddleHeight );
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+function drawPaddle2() {
+  ctx.beginPath();
+  ctx.rect(paddleX2, paddleY2,paddleWidth ,paddleHeight );
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Score : " + score, 8, 20);
+}
+function drawScore2() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Score2 : " + score2, 390, 20);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBall();
+  drawPaddle();
+  drawPaddle2();
+  drawScore();
+  drawScore2();
+
+
+  // collisions de la balle sur le bord bas
+  if (y + dy > canvas.height - ballRadius ) {
+    dy = -dy;
+  }
+  //collisions de la balle sur le bord haut
+  if (y + dy < ballRadius) {
+  dy = -dy;
+}
+//rebond de la balle sur la raquette de gauche.
+  if(x+dx <0 + paddleWidth2+ballRadius){
+    
+    if((y+dy>paddleY2) && (y+dy<paddleY2+paddleHeight2)){ 
+      dx=-dx
+    } else{
+      score=score+1
+      resetBall()
+     //TODO
+    }
+  } else if((x+dx > canvas.width - ballRadius - paddleWidth)){ // a revoir
+    if((y+dy>paddleY) && (y+dy<paddleY+paddleHeight)){
+      dx=-dx
+    } else {
+    score2=score2+1
+    resetBall()
+      //gérer score : à qui donner le point?
+    }
+  }
+
+//rebond de la balle sur la raquette de droite.
+  
+/*
+if (x + dx > canvas.width - ballRadius) {
+  if (x > paddleX && x < paddleX + paddleWidth) {
+    dy = -dy;
+  } else {
+    alert("PERDU !");
+    document.location.reload();
+    clearInterval(interval);
+  }
+    
+}
+*/
+  x += dx;
+  y += dy;
+
+ if (downPressed) {
+  paddleY += 7;
+  if (paddleY + paddleHeight > canvas.height) {
+    paddleY = canvas.height - paddleHeight;
+  }
+} else if (upPressed) {
+  paddleY -= 7;
+  if (paddleY < 0) {
+    paddleY = 0;
+  }
+}
+
+//paddle 2 
+ if (downPressed2) {
+  paddleY2 += 7;
+  if (paddleY2 + paddleHeight > canvas.height) {
+    console.log("OUT")
+    paddleY2 = canvas.height - paddleHeight;
+  }
+} else if (upPressed2) {
+  paddleY2 -= 7;
+  if (paddleY2 < 0) {
+    paddleY2 = 0;
+  }
+}
+}
+
+function startGame() {
+    document.addEventListener("keydown", keyDownHandler);
+    document.addEventListener("keyup", keyUpHandler);
+ interval= setInterval(draw, 10);
+}
+
+function keyDownHandler(e) {
+  /*
+  if (e.key === "Up" || e.key === "ArrowUp"|| e.key === "z") {
+    upPressed = true; upPressed2=true
+  } else if (e.key === "Down" || e.key === "ArrowDown"|| e.key === "s") {
+    downPressed = true; downPressed2=true
+  }
+  
+*/
+switch(e.key){
+  case("ArrowUp"):
+  upPressed=true
+  break;
+  case("z"):
+  upPressed2=true
+  break;
+  case("ArrowDown"):
+  downPressed=true
+  break;
+  case("s"):
+  downPressed2=true
+  break;
+  
+}
+
+}
+
+function keyUpHandler(e) {
+  /*
+  if (e.key === "Up" || e.key === "ArrowUp" || e.key === "z") {
+    upPressed = false;upPressed2=true
+  } else if (e.key === "Down" || e.key === "ArrowDown"|| e.key === "s") {
+    downPressed = false;downPressed2=true
+  }
+    */
+
+  const clef = e.key
+
+  switch(clef){
+    case("ArrowUp"):
+      upPressed=false
+      break;
+    case("z"):
+      upPressed2=false
+      break;
+    case("ArrowDown"):
+      downPressed=false
+      break;
+    case("s"):
+      downPressed2=false
+      break;
+  }
+}
+const runButton = document.getElementById("runButton");
+runButton.addEventListener("click", () => {
+  startGame();
+  runButton.disabled = true;
+});
+    </script>
+   
+  </body>
+</html>
